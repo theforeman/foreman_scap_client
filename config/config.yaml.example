@@ -1,0 +1,23 @@
+# Foreman proxy to which reports should be uploaded
+:server: 'foreman_proxy.example.com'
+:port: 8443
+
+# SSL specific options
+:ca_file: '/var/lib/puppet/ssl/certs/ca.pem'
+# this client certificate, usually the same that puppet agent use
+:host_certificate: '/var/lib/puppet/ssl/certs/client.example.com.pem'
+# this client private key, usually the same that puppet agent use
+:host_private_key: '/var/lib/puppet/ssl/private_keys/client.example.com.pem'
+
+# policy (key is id as in Foreman)
+1:
+  # which profile should be run on this client (use profile id)
+  # you can find out the profile id from ds file by running oscap info name-ds.xml
+  # leave empty for default profile
+  :profile: ''
+  # ds input file
+  :content_path: '/usr/share/xml/scap/ssg/fedora/ssg-fedora-ds.xml'
+
+2:
+  :profile: 'xccdf_org.ssgproject.content_profile_common'
+  :content_path: '/usr/share/xml/scap/ssg/fedora/ssg-fedora-ds.xml'

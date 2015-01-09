@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require 'foreman_scap_client'
+
+if ARGV.size != 1
+  puts "Usage: #{$0} policy_id"
+  puts "  where policy_id is a key used in config file"
+  exit 2
+else
+  ForemanScapClient::Client.new.run(ARGV[0].to_i)
+end
+
