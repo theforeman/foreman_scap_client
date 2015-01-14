@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Client script that runs openscap scan and uploads the result to foreman proxy}
   spec.description   = %q{Client script that runs openscap scan and uploads the result to foreman proxy}
   spec.homepage      = "https://github.com/openscap/foreman_scap_client"
+  spec.license       = "GPL-3.0"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
