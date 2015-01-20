@@ -1,4 +1,5 @@
 %global gem_name foreman_scap_client
+%global config_dir /etc/%{gem_name}
 
 Name: %{gem_name}
 Version: 0.0.1
@@ -63,6 +64,9 @@ cp -a .%{_bindir}/* \
 
 find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
+# create config directory
+mkdir -p %{buildroot}%{config_dir}
+
 # Run the test suite
 %check
 pushd .%{gem_instdir}
@@ -72,6 +76,7 @@ popd
 %files
 %dir %{gem_instdir}
 %{_bindir}/foreman_scap_client
+%{config_dir}
 %{gem_instdir}/bin
 %{gem_libdir}
 %exclude %{gem_cache}
