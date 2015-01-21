@@ -14,6 +14,7 @@ module ForemanScapClient
       Dir.mktmpdir do |dir|
         @tmp_dir = dir
         scan
+        bzip
         upload
       end
     end
@@ -44,6 +45,10 @@ module ForemanScapClient
       "#{@tmp_dir}/results.xml"
     end
 
+    def results_bzip_path
+      "#{results_path}.bz2"
+    end
+
     def scan_command
       if config[[@policy_id]] && config[@policy_id][:profile] && !config[@policy_id][:profile].empty?
         profile = "--profile #{config[@policy_id][:profile]}"
@@ -51,6 +56,20 @@ module ForemanScapClient
         profile = ''
       end
       "oscap xccdf eval #{profile} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+    end
+
+    def bzip_command
+      "/usr/bin/bzip2 #{results_path}"
+    end
+
+    def bzip
+      puts 'DEBUG: running: ' + bzip_command
+      result = `#{bzip_command}`
+      if !$?.success?
+        puts 'bzip failed'
+        puts results
+        exit(2)
+      end
     end
 
     def upload
@@ -70,7 +89,7 @@ module ForemanScapClient
       end
 
       request = Net::HTTP::Put.new uri.path
-      request.body = File.read(results_path)
+      request.body = File.read(results_bzip_path)
       request['Content-Type'] = 'text/xml'
       request['Content-Encoding'] = 'x-bzip2'
       begin
