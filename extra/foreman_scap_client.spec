@@ -23,6 +23,7 @@ BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
+Requires: bzip2
 
 %description
 Client script that runs OpenSCAP scan and uploads the result to foreman proxy.
