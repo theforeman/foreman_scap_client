@@ -31,7 +31,7 @@ module ForemanScapClient
     def scan
       puts "DEBUG: running: " + scan_command
       result = `#{scan_command}`
-      if $?.success?
+      if $?.success? || $?.exitstatus == 2
         @report = results_path
       else
         puts 'Scan failed'
