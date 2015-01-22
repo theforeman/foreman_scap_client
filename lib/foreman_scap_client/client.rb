@@ -45,7 +45,7 @@ module ForemanScapClient
     end
 
     def scan_command
-      if config[[@policy_id]] && config[@policy_id][:profile] && !config[@policy_id][:profile].empty?
+      if config[@policy_id] && config[@policy_id][:profile] && !config[@policy_id][:profile].empty?
         profile = "--profile #{config[@policy_id][:profile]}"
       else
         profile = ''
