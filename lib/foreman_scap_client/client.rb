@@ -3,6 +3,7 @@ require 'tmpdir'
 require 'net/http'
 require 'net/https'
 require 'uri'
+require 'open-uri'
 
 module ForemanScapClient
   CONFIG_FILE = '/etc/foreman_scap_client/config.yaml'
@@ -10,7 +11,7 @@ module ForemanScapClient
   class Client
     def run(policy_id)
       @policy_id = policy_id
-
+      ensure_scan_file
       Dir.mktmpdir do |dir|
         @tmp_dir = dir
         scan
@@ -110,6 +111,26 @@ module ForemanScapClient
       foreman_proxy_fqdn = config[:server]
       foreman_proxy_port = config[:port]
       "https://#{foreman_proxy_fqdn}:#{foreman_proxy_port}"
+    end
+
+    def ensure_scan_file
+      unless File.exist?(config[@policy_id][:content_path])
+        puts "File #{config[@policy_id][:content_path]}. Downloading it from proxy"
+        begin
+          FileUtils.mkdir_p(File.dirname(config[@policy_id][:content_path]))
+          open(config[@policy_id][:content_path], 'wb') do |file|
+            file << open(download_uri(config[@policy_id][:download_url])).read
+          end
+        rescue StandardError => e
+          puts "SCAP file is missing and download failed. Aborting!"
+          puts e.message
+          exit(5)
+        end
+      end
+    end
+
+    def download_uri(download_path)
+      foreman_proxy_uri + download_path
     end
   end
 end
