@@ -130,7 +130,7 @@ module ForemanScapClient
     end
 
     def download_uri(download_path)
-      foreman_proxy_uri + download_path
+      foreman_proxy_uri + "#{download_path}"
     end
   end
 end
