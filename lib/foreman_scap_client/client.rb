@@ -76,19 +76,7 @@ module ForemanScapClient
     def upload
       uri = URI.parse(upload_uri)
       puts "Uploading results to #{uri}"
-      https = Net::HTTP.new(uri.host, uri.port)
-      https.use_ssl = true
-      https.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      https.ca_file = config[:ca_file]
-      begin
-        https.cert = OpenSSL::X509::Certificate.new File.read(config[:host_certificate])
-        https.key = OpenSSL::PKey::RSA.new File.read(config[:host_private_key])
-      rescue StandardError => e
-        puts 'Unable to load certs'
-        puts e.message
-        exit(3)
-      end
-
+      https = generate_https_object(uri)
       request = Net::HTTP::Put.new uri.path
       request.body = File.read(results_bzip_path)
       request['Content-Type'] = 'text/xml'
@@ -113,19 +101,37 @@ module ForemanScapClient
       "https://#{foreman_proxy_fqdn}:#{foreman_proxy_port}"
     end
 
+    def generate_https_object(uri)
+      https = Net::HTTP.new(uri.host, uri.port)
+      https.use_ssl = true
+      https.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      https.ca_file = config[:ca_file]
+      begin
+        https.cert = OpenSSL::X509::Certificate.new File.read(config[:host_certificate])
+        https.key = OpenSSL::PKey::RSA.new File.read(config[:host_private_key])
+      rescue StandardError => e
+        puts 'Unable to load certs'
+        puts e.message
+        exit(3)
+      end
+      https
+    end
+
     def ensure_scan_file
-      unless File.exist?(config[@policy_id][:content_path])
-        puts "File #{config[@policy_id][:content_path]}. Downloading it from proxy"
-        begin
-          FileUtils.mkdir_p(File.dirname(config[@policy_id][:content_path]))
-          open(config[@policy_id][:content_path], 'wb') do |file|
-            file << open(download_uri(config[@policy_id][:download_url])).read
-          end
-        rescue StandardError => e
-          puts "SCAP file is missing and download failed. Aborting!"
-          puts e.message
-          exit(5)
+      return if File.exist?(config[@policy_id][:content_path])
+      puts "File #{config[@policy_id][:content_path]} is missing. Downloading it from proxy"
+      begin
+        FileUtils.mkdir_p(File.dirname(config[@policy_id][:content_path]))
+        uri = URI.parse(download_uri(config[@policy_id][:download_path]))
+        puts "Download scap content xml from: #{uri}"
+        request = generate_https_object(uri).get(uri)
+        scap_content_xml = request.body
+        open(config[@policy_id][:content_path], 'wb') do |file|
+          file << scap_content_xml
         end
+      rescue StandardError => e
+        puts "SCAP file is missing and download failed with error: #{e.message}"
+        exit(5)
       end
     end
 
