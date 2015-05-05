@@ -125,6 +125,7 @@ module ForemanScapClient
         uri = URI.parse(download_uri(config[@policy_id][:download_path]))
         puts "Download scap content xml from: #{uri}"
         request = generate_https_object(uri).get(uri.path)
+        request.value
         scap_content_xml = request.body
         open(config[@policy_id][:content_path], 'wb') do |file|
           file << scap_content_xml
