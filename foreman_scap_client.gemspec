@@ -6,8 +6,8 @@ require 'foreman_scap_client/version'
 Gem::Specification.new do |spec|
   spec.name          = "foreman_scap_client"
   spec.version       = ForemanScapClient::VERSION
-  spec.authors       = ["Marek Hulan", "Šimon Lukašík"]
-  spec.email         = ["mhulan@redhat.com", "slukasik@redhat.com"]
+  spec.authors       = ["Marek Hulan", "Šimon Lukašík", "Shlomi Zadok"]
+  spec.email         = ["mhulan@redhat.com", "slukasik@redhat.com", "szadok@redhat.com"]
   spec.summary       = %q{Client script that runs openscap scan and uploads the result to foreman proxy}
   spec.description   = %q{Client script that runs openscap scan and uploads the result to foreman proxy}
   spec.homepage      = "https://github.com/openscap/foreman_scap_client"
