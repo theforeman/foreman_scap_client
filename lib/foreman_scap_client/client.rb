@@ -11,6 +11,7 @@ module ForemanScapClient
   class Client
     def run(policy_id)
       @policy_id = policy_id
+      ensure_policy_exist
       ensure_scan_file
       Dir.mktmpdir do |dir|
         @tmp_dir = dir
@@ -115,6 +116,13 @@ module ForemanScapClient
         exit(3)
       end
       https
+    end
+
+    def ensure_policy_exist
+      if config[@policy_id].nil?
+        puts "Policy id #{@policy_id} not found."
+        exit(1)
+      end
     end
 
     def ensure_scan_file
