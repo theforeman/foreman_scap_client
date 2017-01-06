@@ -9,10 +9,13 @@ module ForemanScapClient
   CONFIG_FILE = '/etc/foreman_scap_client/config.yaml'
 
   class Client
+    attr_reader :config, :policy_id, :tailored
+
     def run(policy_id)
       @policy_id = policy_id
-      ensure_policy_exist
+      load_config
       ensure_scan_file
+      ensure_tailoring_file
       Dir.mktmpdir do |dir|
         @tmp_dir = dir
         scan
@@ -23,8 +26,10 @@ module ForemanScapClient
 
     private
 
-    def config
+    def load_config
       @config ||= YAML.load_file(CONFIG_FILE)
+      ensure_policy_exist
+      @tailored = !@config[policy_id][:tailoring_path].empty?
     rescue => e
       puts 'Config file could not be loaded'
       puts e.message
@@ -57,7 +62,11 @@ module ForemanScapClient
       else
         profile = ''
       end
-      "oscap xccdf eval #{profile} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+      "oscap xccdf eval #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+    end
+
+    def tailoring_subcommand
+      tailored ? "--tailoring-file #{config[policy_id][:tailoring_path]}" : ""
     end
 
     def bzip_command
@@ -125,23 +134,32 @@ module ForemanScapClient
       end
     end
 
-    def ensure_scan_file
-      return if File.exist?(config[@policy_id][:content_path])
-      puts "File #{config[@policy_id][:content_path]} is missing. Downloading it from proxy"
+    def ensure_file(dir, download_path, type_humanized)
+      return if File.exist?(config[policy_id][dir])
+      puts "File #{config[policy_id][dir]} is missing. Downloading it from proxy."
       begin
-        FileUtils.mkdir_p(File.dirname(config[@policy_id][:content_path]))
-        uri = URI.parse(download_uri(config[@policy_id][:download_path]))
-        puts "Download scap content xml from: #{uri}"
+        FileUtils.mkdir_p(File.dirname(config[policy_id][dir]))
+        uri = URI.parse(download_uri(config[policy_id][download_path]))
+        puts "Download #{type_humanized} xml from: #{uri}"
         request = generate_https_object(uri).get(uri.path)
         request.value
-        scap_content_xml = request.body
-        open(config[@policy_id][:content_path], 'wb') do |file|
-          file << scap_content_xml
+        ds_content_xml = request.body
+        open(config[policy_id][dir], 'wb') do |file|
+          file << ds_content_xml
         end
       rescue StandardError => e
-        puts "SCAP file is missing and download failed with error: #{e.message}"
+        puts "#{type_humanized} is missing and download failed with error: #{e.message}"
         exit(5)
       end
+    end
+
+    def ensure_scan_file
+      ensure_file :content_path, :download_path, "SCAP content"
+    end
+
+    def ensure_tailoring_file
+      return unless tailored
+      ensure_file :tailoring_path, :tailoring_download_path, "Tailoring file"
     end
 
     def download_uri(download_path)
