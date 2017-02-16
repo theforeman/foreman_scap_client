@@ -29,7 +29,7 @@ module ForemanScapClient
     def load_config
       @config ||= YAML.load_file(CONFIG_FILE)
       ensure_policy_exist
-      @tailored = !@config[policy_id][:tailoring_path].empty?
+      @tailored = @config[policy_id][:tailoring_path] && !@config[policy_id][:tailoring_path].empty?
     rescue => e
       puts 'Config file could not be loaded'
       puts e.message
