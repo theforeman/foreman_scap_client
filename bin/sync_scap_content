@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+require 'digest/sha2'
+require 'fileutils'
+
+if `rpm -qa | grep scap-security-guide`.empty?
+  puts "# Can't find scap-security-guide RPM, aborting!"
+  puts "# Install scap-security-guide RPM and re-run this script"
+  exit
+end
+
+# Create directory to stored digested files.
+FileUtils.mkdir_p('/var/lib/openscap/content/')
+
+# scap-security-guide currently supports datastreams for
+# Fedora, RHEL6 & RHEL7
+datastreams = `rpm -ql scap-security-guide | grep ds.xml`.split
+datastreams.each do |ds|
+  file = File.open(ds).read
+  datastream = file.chomp('')
+  digest = Digest::SHA2.hexdigest(datastream)
+  FileUtils.cp(ds, "/var/lib/openscap/content/#{digest}.xml")
+end
