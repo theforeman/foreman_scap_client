@@ -2,6 +2,13 @@
 :server: 'foreman_proxy.example.com'
 :port: 8443
 
+# Should --fetch-remote-resources be added to `oscap xccdf eval` command
+:fetch_remote_resources: true
+
+# HTTP proxy server for downloading remote resources
+:http_proxy_server:
+:http_proxy_port:
+
 # SSL specific options
 :ca_file: '/var/lib/puppet/ssl/certs/ca.pem'
 # this client certificate, usually the same that puppet agent use
