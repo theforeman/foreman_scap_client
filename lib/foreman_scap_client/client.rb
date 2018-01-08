@@ -4,6 +4,7 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 require 'open-uri'
+require 'open3'
 
 module ForemanScapClient
   CONFIG_FILE = '/etc/foreman_scap_client/config.yaml'
@@ -38,14 +39,33 @@ module ForemanScapClient
 
     def scan
       puts "DEBUG: running: " + scan_command
-      result = `#{scan_command}`
-      if $?.success? || $?.exitstatus == 2
+      stdout_str, error_str, result = Open3.capture3(scan_command_env_vars, scan_command)
+      if result.success? || result.exitstatus == 2
         @report = results_path
       else
         puts 'Scan failed'
-        puts result
+        puts stdout_str
+        puts error_str
         exit(2)
       end
+    end
+
+    def scan_command_env_vars
+      if http_proxy_uri
+        {
+          'HTTP_PROXY'  => http_proxy_uri,
+          'HTTPS_PROXY' => http_proxy_uri
+        }
+      else
+        {}
+      end
+    end
+
+    def http_proxy_uri
+      return nil unless config[:http_proxy_server] && config[:http_proxy_port]
+      http_proxy_server = config[:http_proxy_server]
+      http_proxy_port   = config[:http_proxy_port]
+      "http://#{http_proxy_server}:#{http_proxy_port}"
     end
 
     def results_path
@@ -62,7 +82,12 @@ module ForemanScapClient
       else
         profile = ''
       end
-      "oscap xccdf eval #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+      fetch_remote_resources = if config[:fetch_remote_resources]
+                                 '--fetch-remote-resources'
+                               else
+                                 ''
+                               end
+      "oscap xccdf eval #{fetch_remote_resources} #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
     end
 
     def tailoring_subcommand
