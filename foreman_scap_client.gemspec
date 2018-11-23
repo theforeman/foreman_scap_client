@@ -13,10 +13,9 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/openscap/foreman_scap_client"
   spec.license       = "GPL-3.0"
 
-  spec.files         = `git ls-files -z`.split("\x0")
+  spec.files         = Dir["{bin,config,lib}/**/*", "LICENSE", "README.md"]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.files         = Dir["{bin,config,lib}/**/*", "LICENSE", "README.md"]
   spec.test_files    = Dir["test/**/*"]
   spec.require_paths = ["lib"]
 
