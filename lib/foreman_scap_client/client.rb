@@ -96,7 +96,7 @@ module ForemanScapClient
     end
 
     def bzip_command
-      "/usr/bin/bzip2 #{results_path}"
+      "/usr/bin/env bzip2 #{results_path}"
     end
 
     def bzip
