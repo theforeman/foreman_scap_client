@@ -1,3 +1,4 @@
+require 'rubygems' if RUBY_VERSION.start_with? '1.8'
 require 'yaml'
 require 'tmpdir'
 require 'net/http'
@@ -28,6 +29,10 @@ module ForemanScapClient
 
     private
 
+    def warn_proxy_not_supported
+      puts 'Configuration for HTTP(S) proxy found but not supported for ruby 1.8' if http_proxy_uri
+    end
+
     def load_config
       @config ||= YAML.load_file(CONFIG_FILE)
       ensure_policy_exist
@@ -40,6 +45,15 @@ module ForemanScapClient
 
     def scan
       puts "DEBUG: running: " + scan_command
+
+      if RUBY_VERSION.start_with? '1.8'
+        legacy_run_scan
+      else
+        run_scan
+      end
+    end
+
+    def run_scan
       stdout_str, error_str, result = Open3.capture3(scan_command_env_vars, scan_command)
       if result.success? || result.exitstatus == 2
         @report = results_path
@@ -47,6 +61,19 @@ module ForemanScapClient
         puts 'Scan failed'
         puts stdout_str
         puts error_str
+        exit(2)
+      end
+    end
+
+    def legacy_run_scan
+      warn_proxy_not_supported
+      result = `#{scan_command}`
+
+      if $?.success? || $?.exitstatus == 2
+        @report = results_path
+      else
+        puts 'Scan failed'
+        puts result
         exit(2)
       end
     end
