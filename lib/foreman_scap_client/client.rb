@@ -45,6 +45,7 @@ module ForemanScapClient
 
     def scan
       puts "DEBUG: running: " + scan_command
+      puts "with ENV vars: #{scan_command_env_vars}" unless scan_command_env_vars.empty?
 
       if RUBY_VERSION.start_with? '1.8'
         legacy_run_scan
@@ -56,7 +57,9 @@ module ForemanScapClient
     def run_scan
       stdout_str, error_str, result = Open3.capture3(scan_command_env_vars, scan_command)
       if result.success? || result.exitstatus == 2
-        puts error_str
+        puts error_str.split("\n")
+                      .select { |item| item.start_with?('WARNING:') || item.start_with?('Downloading') }
+                      .join("\n")
         @report = results_path
       else
         puts 'Scan failed'
@@ -82,7 +85,8 @@ module ForemanScapClient
     def scan_command_env_vars
       if http_proxy_uri
         {
-          'HTTP_PROXY'  => http_proxy_uri
+          'HTTP_PROXY'  => http_proxy_uri,
+          'HTTPS_PROXY' => http_proxy_uri
         }
       else
         {}
