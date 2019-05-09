@@ -142,6 +142,7 @@ module ForemanScapClient
       uri = URI.parse(upload_uri)
       puts "Uploading results to #{uri}"
       https = generate_https_object(uri)
+      https.read_timeout = config[:timeout] if config[:timeout]
       request = Net::HTTP::Post.new uri.path
       request.body = File.read(results_bzip_path)
       request['Content-Type'] = 'text/xml'

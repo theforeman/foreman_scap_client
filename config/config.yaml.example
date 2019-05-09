@@ -2,6 +2,9 @@
 :server: 'foreman_proxy.example.com'
 :port: 8443
 
+# Timeout for sending reports to proxy
+:timeout: 60
+
 # Should --fetch-remote-resources be added to `oscap xccdf eval` command
 :fetch_remote_resources: true
 
