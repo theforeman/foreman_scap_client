@@ -22,12 +22,20 @@ module ForemanScapClient
       Dir.mktmpdir do |dir|
         @tmp_dir = dir
         scan
+        if config[@policy_id][:insight]
+          insight_upload
+        end
+
         bzip
         upload
       end
     end
 
     private
+
+    def insight_upload
+        `insights-client --verbose --payload  #{results_path}.insight --content-type application/vnd.redhat.compliance.something+tgz`
+    end
 
     def warn_proxy_not_supported
       puts 'Configuration for HTTP(S) proxy found but not supported for ruby 1.8' if http_proxy_uri
@@ -117,7 +125,11 @@ module ForemanScapClient
                                else
                                  ''
                                end
-      "oscap xccdf eval #{fetch_remote_resources} #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+      if config[@policy_id][:insight]
+        "oscap xccdf eval #{fetch_remote_resources} #{profile} #{tailoring_subcommand} --results-arf #{results_path} --results #{results_path}.insight #{config[@policy_id][:content_path]}"
+      else
+        "oscap xccdf eval #{fetch_remote_resources} #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+      end
     end
 
     def tailoring_subcommand
