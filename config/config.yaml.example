@@ -18,6 +18,8 @@
 :host_certificate: '/var/lib/puppet/ssl/certs/client.example.com.pem'
 # this client private key, usually the same that puppet agent use
 :host_private_key: '/var/lib/puppet/ssl/private_keys/client.example.com.pem'
+# optional cipher list if endpoints are hardened
+:ciphers: ["AES256-SHA:AES128-SHA:DES-CBC3-SHA"]
 
 # policy (key is id as in Foreman)
 1:
