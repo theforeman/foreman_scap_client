@@ -171,6 +171,7 @@ module ForemanScapClient
     def generate_https_object(uri)
       https = Net::HTTP.new(uri.host, uri.port)
       https.use_ssl = true
+      https.ciphers = config[:ciphers] if config[:ciphers]
       https.verify_mode = OpenSSL::SSL::VERIFY_PEER
       https.ca_file = config[:ca_file]
       begin
