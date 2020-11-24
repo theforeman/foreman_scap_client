@@ -60,7 +60,7 @@ module ForemanScapClient
 
     def load_config
       @config ||= YAML.load_file(CONFIG_FILE)
-      ensure_policy_exist
+      ensure_policy_exists
     rescue => e
       puts 'Config file could not be loaded'
       puts e.message
@@ -191,7 +191,7 @@ module ForemanScapClient
       https
     end
 
-    def ensure_policy_exist
+    def ensure_policy_exists
       if policy_from_config.nil?
         puts "Policy id #{@policy_id} not found."
         exit(1)

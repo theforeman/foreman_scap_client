@@ -13,7 +13,7 @@ module ForemanScapClient
     end
 
     def upload_uri
-      foreman_proxy_uri + "/compliance/oval_report/#{@policy_id}"
+      foreman_proxy_uri + "/compliance/oval_reports/#{@policy_id}"
     end
 
     def scan_command
