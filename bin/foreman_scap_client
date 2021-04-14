@@ -2,11 +2,12 @@
 require 'rubygems'
 require 'foreman_scap_client'
 
-if ARGV.size != 1
-  puts "Usage: #{$0} policy_id"
+if ARGV.size == 1
+  ForemanScapClient::Client.new.run(ARGV[0].to_i)
+elsif ARGV.size == 2 && ARGV[1] == '--skip-upload'
+  ForemanScapClient::Client.new.run(ARGV[0].to_i, true)
+else
+  puts "Usage: #{$0} policy_id [--skip-upload]"
   puts "  where policy_id is a key used in config file"
   exit 2
-else
-  ForemanScapClient::Client.new.run(ARGV[0].to_i)
 end
-

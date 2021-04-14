@@ -14,20 +14,30 @@ module ForemanScapClient
   class Client
     attr_reader :config, :policy_id, :tailored
 
-    def run(policy_id)
+    def run(policy_id, skip_upload = false)
       @policy_id = policy_id
       load_config
       ensure_scan_file
       ensure_tailoring_file
-      Dir.mktmpdir do |dir|
-        @tmp_dir = dir
-        scan
-        bzip
-        upload
-      end
+      run_in_tmpdir skip_upload
     end
 
     private
+
+    def run_in_tmpdir(skip_upload)
+      if skip_upload
+        @tmp_dir = Dir.mktmpdir
+        scan
+        bzip
+      else
+        Dir.mktmpdir do |dir|
+          @tmp_dir = dir
+          scan
+          bzip
+          upload
+        end
+      end
+    end
 
     def warn_proxy_not_supported
       puts 'Configuration for HTTP(S) proxy found but not supported for ruby 1.8' if http_proxy_uri
