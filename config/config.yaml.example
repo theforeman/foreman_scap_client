@@ -28,11 +28,11 @@
   # leave empty for default profile
   :profile: ''
   # ds input file
-  :content_path: '/usr/share/xml/scap/ssg/fedora/ssg-fedora-ds.xml'
+  :content_path: '/usr/share/xml/scap/ssg/content/ssg-fedora-ds.xml'
 
 2:
   :profile: 'xccdf_org.ssgproject.content_profile_common'
-  :content_path: '/usr/share/xml/scap/ssg/fedora/ssg-fedora-ds.xml'
+  :content_path: '/usr/share/xml/scap/ssg/content/ssg-fedora-ds.xml'
 
 :oval:
   3:
