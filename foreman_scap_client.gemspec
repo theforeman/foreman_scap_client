@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["mhulan@redhat.com", "slukasik@redhat.com", "szadok@redhat.com"]
   spec.summary       = %q{Client script that runs openscap scan and uploads the result to foreman proxy}
   spec.description   = %q{Client script that runs openscap scan and uploads the result to foreman proxy}
-  spec.homepage      = "https://github.com/openscap/foreman_scap_client"
+  spec.homepage      = "https://github.com/theforeman/foreman_scap_client"
   spec.license       = "GPL-3.0"
 
   spec.files         = Dir["{bin,config,lib}/**/*", "LICENSE", "README.md"]
