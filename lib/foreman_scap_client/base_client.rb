@@ -188,6 +188,7 @@ module ForemanScapClient
         puts e.message
         exit(3)
       end
+      https.verify_mode = config[:ssl_verify_mode] == false ? OpenSSL::SSL::VERIFY_NONE : OpenSSL::SSL::VERIFY_PEER
       https
     end
 
