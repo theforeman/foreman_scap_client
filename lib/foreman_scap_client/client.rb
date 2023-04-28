@@ -36,7 +36,14 @@ module ForemanScapClient
                                else
                                  ''
                                end
-      "oscap xccdf eval #{fetch_remote_resources} #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
+      # OpenSCAP 1.3.6 and newer requires the `--local-files` option to use local copies of remote SDS components
+      version = `rpm -q openscap`.split('-')[1]
+      if version >= '1.3.6' and not config[:fetch_remote_resources]
+        local_files = '--local-files /root'
+      else
+        local_files = ''
+      end
+      "oscap xccdf eval #{fetch_remote_resources} #{local_files} #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
     end
 
     def tailoring_subcommand
