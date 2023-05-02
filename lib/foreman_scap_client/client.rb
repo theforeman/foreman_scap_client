@@ -38,11 +38,11 @@ module ForemanScapClient
                                end
       # OpenSCAP 1.3.6 and newer requires the `--local-files` option to use local copies of remote SDS components
       version = `rpm -q openscap`.split('-')[1]
-      if version >= '1.3.6' and not config[:fetch_remote_resources]
-        local_files = '--local-files /root'
-      else
-        local_files = ''
-      end
+      local_files = if Gem::Version.new(version) >= Gem::Version.new('1.3.6') && !config[:fetch_remote_resources]
+                      '--local-files /root'
+                    else
+                      ''
+                    end
       "oscap xccdf eval #{fetch_remote_resources} #{local_files} #{profile} #{tailoring_subcommand} --results-arf #{results_path} #{config[@policy_id][:content_path]}"
     end
 
