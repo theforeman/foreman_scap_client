@@ -40,10 +40,10 @@ module ForemanScapClient
     end
 
     def local_files_subcommand
-      supports_local_file_option ? '--local-files /root' : ''
+      supports_local_file_option? ? '--local-files /root' : ''
     end
 
-    def supports_local_file_option
+    def supports_local_file_option?
       # OpenSCAP 1.3.6 and newer requires the `--local-files` option to use local copies of remote SDS components
       version = `rpm -q openscap`.split('-')[1]
       Gem::Version.new(version) >= Gem::Version.new('1.3.6') && !config[:fetch_remote_resources]
