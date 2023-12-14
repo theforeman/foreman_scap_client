@@ -182,7 +182,7 @@ module ForemanScapClient
       https.ca_file = config[:ca_file]
       begin
         https.cert = OpenSSL::X509::Certificate.new File.read(config[:host_certificate])
-        https.key = OpenSSL::PKey::RSA.new File.read(config[:host_private_key])
+        https.key = OpenSSL::PKey.read File.read(config[:host_private_key])
       rescue StandardError => e
         puts 'Unable to load certs'
         puts e.message
