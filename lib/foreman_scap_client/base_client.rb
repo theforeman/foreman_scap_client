@@ -1,4 +1,3 @@
-require 'rubygems' if RUBY_VERSION.start_with? '1.8'
 require 'yaml'
 require 'tmpdir'
 require 'net/http'
@@ -71,11 +70,7 @@ module ForemanScapClient
       puts "DEBUG: running: " + scan_command
       puts "with ENV vars: #{scan_command_env_vars}" unless scan_command_env_vars.empty?
 
-      if RUBY_VERSION.start_with? '1.8'
-        legacy_run_scan
-      else
-        run_scan
-      end
+      run_scan
     end
 
     def run_scan
@@ -87,19 +82,6 @@ module ForemanScapClient
         puts 'Scan failed'
         puts stdout_str
         puts error_str
-        exit(2)
-      end
-    end
-
-    def legacy_run_scan
-      warn_proxy_not_supported
-      result = `#{scan_command}`
-
-      if $?.success? || $?.exitstatus == 2
-        @report = results_path
-      else
-        puts 'Scan failed'
-        puts result
         exit(2)
       end
     end
@@ -128,10 +110,6 @@ module ForemanScapClient
 
     def results_bzip_path
       "#{results_path}.bz2"
-    end
-
-    def warn_proxy_not_supported
-      puts 'Configuration for HTTP(S) proxy found but not supported for ruby 1.8' if http_proxy_uri
     end
 
     def bzip_command
