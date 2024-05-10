@@ -81,7 +81,7 @@ module ForemanScapClient
     def run_scan
       stdout_str, error_str, result = Open3.capture3(scan_command_env_vars, scan_command)
       if result.success? || result.exitstatus == 2
-        puts error_str.scrub("?").split("\n").select { |item| item.start_with?('WARNING:') || item.start_with?('Downloading') }.join("\n")
+        error_str.each_line { |item| print item if item.start_with?('WARNING:') || item.start_with?('Downloading') }
         @report = results_path
       else
         puts 'Scan failed'
