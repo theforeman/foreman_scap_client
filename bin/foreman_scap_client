@@ -12,12 +12,11 @@ end
 
 if args.size == 1
   ForemanScapClient::Client.new.run(args[0].to_i, skip_upload)
+# Left around for compatibility
 elsif args.size == 2 && args[0] == 'ds'
   ForemanScapClient::Client.new.run(args[1].to_i, skip_upload)
-elsif args.size == 2 && args[0] == 'oval'
-  ForemanScapClient::OvalClient.new.run(args[1].to_i, skip_upload)
 else
-  puts "Usage: #{$0} [ds | oval] policy_id [--skip-upload]"
+  puts "Usage: #{$0} [ds] policy_id [--skip-upload]"
   puts "  where policy_id is a key used in config file"
   exit 2
 end
