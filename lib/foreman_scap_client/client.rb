@@ -45,8 +45,9 @@ module ForemanScapClient
 
     def supports_local_file_option?
       # OpenSCAP 1.3.6 and newer requires the `--local-files` option to use local copies of remote SDS components
-      version, _stderr, status = Open3.capture3('rpm', '-q', '--qf', '%{version}', 'openscap')
+      versions, _stderr, status = Open3.capture3('oscap', '--version')
       return false unless status.success?
+      version = versions.lines[0].split.last
       Gem::Version.new(version) >= Gem::Version.new('1.3.6')
     end
 
